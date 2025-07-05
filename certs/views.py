@@ -1,10 +1,13 @@
 import os
 import tempfile
 import uuid
-from django.shortcuts import render
+
 from django.http import FileResponse, HttpResponseBadRequest
+from django.shortcuts import render
+
 from .forms import UploadForm
 from .pdf_utils import clean_pdf, sign_single_pdf
+
 
 def upload_and_sign(request):
     if request.method == 'POST':
@@ -24,15 +27,19 @@ def upload_and_sign(request):
             cleaned_path = None
             signed_path = None
             pfx_path = None
-            
+
             try:
                 # Create temporary files
-                with tempfile.NamedTemporaryFile(suffix="_original.pdf", delete=False) as original_temp:
+                with tempfile.NamedTemporaryFile(
+                    suffix="_original.pdf", delete=False
+                ) as original_temp:
                     for chunk in uploaded_file.chunks():
                         original_temp.write(chunk)
                     original_path = original_temp.name
 
-                with tempfile.NamedTemporaryFile(suffix="_cleaned.pdf", delete=False) as cleaned_temp:
+                with tempfile.NamedTemporaryFile(
+                    suffix="_cleaned.pdf", delete=False
+                ) as cleaned_temp:
                     cleaned_path = cleaned_temp.name
 
                 with tempfile.NamedTemporaryFile(suffix="_signed.pdf", delete=False) as signed_temp:
@@ -54,18 +61,17 @@ def upload_and_sign(request):
                     pfx_path=pfx_path,
                     pfx_password=pfx_password,
                     position=position,
-                    page=page
+                    page=page,
                 )
 
                 # Return signed file
                 response = FileResponse(
-                    open(signed_path, 'rb'),
-                    as_attachment=True,
-                    filename='signed_document.pdf'
+                    open(signed_path, 'rb'), as_attachment=True, filename='signed_document.pdf'
                 )
 
                 # Clean up temp files after response
                 import threading
+
                 def cleanup():
                     for path in [original_path, cleaned_path, signed_path, pfx_path]:
                         if path and os.path.exists(path):
@@ -73,7 +79,7 @@ def upload_and_sign(request):
                                 os.remove(path)
                             except OSError:
                                 pass
-                
+
                 threading.Timer(3, cleanup).start()
 
                 return response
@@ -86,7 +92,7 @@ def upload_and_sign(request):
                             os.remove(path)
                         except OSError:
                             pass
-                
+
                 return HttpResponseBadRequest(f"Error signing PDF: {e}")
 
     else:

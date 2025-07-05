@@ -2,8 +2,9 @@ import pikepdf
 from pyhanko.pdf_utils.reader import PdfFileReader
 from pyhanko.pdf_utils.writer import copy_into_new_writer
 from pyhanko.sign.fields import SigFieldSpec, append_signature_field
-from pyhanko.sign.signers import SimpleSigner, PdfSigner
+from pyhanko.sign.signers import PdfSigner, SimpleSigner
 from pyhanko.sign.signers.pdf_signer import PdfSignatureMetadata
+
 
 def clean_pdf(input_path, output_path):
     """Sanitize a PDF to ensure it's valid and compatible for signing."""
@@ -36,7 +37,7 @@ def sign_single_pdf(input_path, output_path, pfx_path, pfx_password, position, p
 
         # Convert position string to tuple
         signature_box = eval(position)
-        
+
         # Determine target page
         if page == 'ultima':
             target_page = total_pages - 1
@@ -44,9 +45,7 @@ def sign_single_pdf(input_path, output_path, pfx_path, pfx_password, position, p
             target_page = int(page)
 
         sig_field = SigFieldSpec(
-            sig_field_name="Signature1",
-            box=signature_box,
-            on_page=target_page
+            sig_field_name="Signature1", box=signature_box, on_page=target_page
         )
 
         writer = copy_into_new_writer(reader)
@@ -57,8 +56,8 @@ def sign_single_pdf(input_path, output_path, pfx_path, pfx_password, position, p
                 signature_meta=PdfSignatureMetadata(
                     field_name=sig_field.sig_field_name,
                     reason="Firma electrónica",
-                    location="Web App"
+                    location="Web App",
                 ),
-                signer=signer
+                signer=signer,
             )
             pdf_signer.sign_pdf(writer, output=outf)

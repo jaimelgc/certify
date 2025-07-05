@@ -13,25 +13,18 @@ PAGES = [
     ('0', 'Primera Página'),
 ]
 
+
 class UploadForm(forms.Form):
     file = forms.FileField(label="PDF a firmar")
     pfx_file = forms.FileField(label="Archivo PFX")
     pfx_password = forms.CharField(
-        widget=forms.PasswordInput,
-        label="Contraseña del archivo PFX",
-        max_length=100
+        widget=forms.PasswordInput, label="Contraseña del archivo PFX", max_length=100
     )
     position = forms.ChoiceField(
-        choices=POSITIONS,
-        widget=forms.RadioSelect,
-        label="Posición de la firma"
+        choices=POSITIONS, widget=forms.RadioSelect, label="Posición de la firma"
     )
-    page = forms.ChoiceField(
-        choices=PAGES,
-        widget=forms.RadioSelect,
-        label="Página a firmar"
-    )
-    
+    page = forms.ChoiceField(choices=PAGES, widget=forms.RadioSelect, label="Página a firmar")
+
     def clean_pfx_file(self):
         pfx_file = self.cleaned_data.get('pfx_file')
         if pfx_file:

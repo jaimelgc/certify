@@ -123,6 +123,3 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-PFX_PATH =  "certs/files/jaime.pfx"
-PFX_PASSWORD = "WeloPeste"

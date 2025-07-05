@@ -1,14 +1,166 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
+<style>
+    .drag-drop {
+        border: 2px dashed #bbb;
+        border-radius: 6px;
+        padding: 30px;
+        text-align: center;
+        color: #999;
+        font-size: 14px;
+        margin-bottom: 20px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .drag-drop.dragover {
+        background-color: #e8f0fe;
+        border-color: #4285f4;
+        color: #333;
+    }
+
+    .drag-drop input[type="file"] {
+        display: none;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const dragAreas = document.querySelectorAll('.drag-drop');
+
+        dragAreas.forEach(area => {
+            const fileInput = area.querySelector('input[type="file"]');
+
+            area.addEventListener('click', () => fileInput.click());
+
+            area.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                area.classList.add('dragover');
+            });
+
+            area.addEventListener('dragleave', () => {
+                area.classList.remove('dragover');
+            });
+
+            area.addEventListener('drop', (e) => {
+                e.preventDefault();
+                area.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    fileInput.files = files;
+
+                    // Optionally show the selected filename
+                    const label = area.querySelector('.filename');
+                    label.textContent = files[0].name;
+                }
+            });
+        });
+    });
+</script>
 <head>
-    <title>Upload PDF</title>
+    <meta charset="UTF-8">
+    <title>Subir PDF</title>
+    <style>
+        body {
+            font-family: "Segoe UI", Roboto, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            background-color: white;
+            padding: 30px 40px;
+            border-radius: 8px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 25px;
+            text-align: center;
+            color: #333;
+        }
+
+        form p {
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 8px;
+            color: #444;
+        }
+
+        input[type="file"] {
+            width: 100%;
+            padding: 8px;
+            font-size: 14px;
+        }
+
+        .radio-group {
+            margin-bottom: 20px;
+        }
+
+        .radio-group label {
+            font-weight: normal;
+            margin-right: 15px;
+        }
+
+        button {
+            background-color: #2c3e50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #1a252f;
+        }
+    </style>
 </head>
 <body>
-    <h1>Upload a PDF</h1>
-    <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Upload & Sign</button>
-    </form>
+    <div class="container">
+        <h1>Subir y Firmar PDF</h1>
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <p>
+                {{ form.file.label_tag }}
+                <div class="drag-drop">
+                    {{ form.file }}
+                    <div class="filename">Arrastra un PDF aquí o haz clic para seleccionar</div>
+                </div>
+            </p>
+            <p>
+                {{ form.pfx_file.label_tag }}
+                <div class="drag-drop">
+                    {{ form.pfx_file }}
+                    <div class="filename">Arrastra tu archivo .pfx aquí o haz clic para seleccionar</div>
+                </div>
+            </p>
+            <p>
+                {{ form.pfx_password.label_tag }}
+                {{ form.pfx_password }}
+            </p>
+            <p>
+                {{ form.position.label_tag }}
+                {{ form.position }}
+            </p>
+            <p>
+                {{ form.page.label_tag }}
+                {{ form.page }}
+            </p>            
+            <button type="submit">Subir y Firmar</button>
+        </form>
+    </div>
 </body>
 </html>

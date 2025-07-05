@@ -14,7 +14,8 @@ def clean_pdf(input_path, output_path):
         raise ValueError(f"Failed to clean PDF: {e}")
 
 
-def sign_single_pdf(input_path, output_path, pfx_path, pfx_password):
+def sign_single_pdf(input_path, output_path, pfx_path, pfx_password, position, page):
+    """Sign a PDF with user-provided parameters."""
     # Try loading the signer
     try:
         signer = SimpleSigner.load_pkcs12(
@@ -33,9 +34,14 @@ def sign_single_pdf(input_path, output_path, pfx_path, pfx_password):
         reader = PdfFileReader(inf)
         total_pages = len(reader.root['/Pages']['/Kids'])
 
-        # Signature box settings
-        signature_box = (400, 50, 550, 100)
-        target_page = total_pages - 1
+        # Convert position string to tuple
+        signature_box = eval(position)
+        
+        # Determine target page
+        if page == 'ultima':
+            target_page = total_pages - 1
+        else:
+            target_page = int(page)
 
         sig_field = SigFieldSpec(
             sig_field_name="Signature1",
@@ -56,4 +62,3 @@ def sign_single_pdf(input_path, output_path, pfx_path, pfx_password):
                 signer=signer
             )
             pdf_signer.sign_pdf(writer, output=outf)
-
